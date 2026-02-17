@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>バスケットボールシューズ診断</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .question-container {
+            display: none;
+        }
+
+        .question-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question h2 {
+            color: #333;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .option-icon {
+            font-size: 24px;
+            margin-right: 12px;
+        }
+
+        .option-text {
+            flex: 1;
+        }
+
+        .option-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .option-desc {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .result-container {
+            display: none;
+            text-align: center;
+        }
+
+        .result-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .result-shoe {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .result-shoe h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .result-shoe .brand {
+            color: #667eea;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .result-shoe .description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: grid;
+            gap: 10px;
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .feature {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .start-screen h2 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .start-screen p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏀 バスケットボールシューズ診断</h1>
+            <p>あなたに最適なバッシュを見つけましょう</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="start-screen">
+            <div class="icon">👟</div>
+            <h2>あなたにぴったりのバッシュを見つけます</h2>
+            <p>5つの簡単な質問に答えるだけで、プレイスタイルや足の特徴に合った最適なバスケットボールシューズをおすすめします。</p>
+            <button class="btn btn-primary" onclick="startQuiz()">診断を始める</button>
+        </div>
+
+        <!-- Question 1: Playing Style -->
+        <div id="q1" class="question-container">
+            <div class="question">
+                <h2>あなたのプレイスタイルは？</h2>
+                <div class="options">
+                    <div class="option" onclick="selectOption(1, 'speed')">
+                        <span class="option-icon">⚡</span>
+                        <div class="option-text">
+                            <div class="option-title">スピード重視</div>
+                            <div class="option-desc">速攻、ドライブが得意</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(1, 'power')">
+                        <span class="option-icon">💪</span>
+                        <div class="option-text">
+                            <div class="option-title">パワー重視</div>
+                            <div class="option-desc">ポストプレイ、リバウンド</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(1, 'allround')">
+                        <span class="option-icon">🎯</span>
+                        <div class="option-text">
+                            <div class="option-title">オールラウンド</div>
+                            <div class="option-desc">バランスの良いプレイ</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(1, 'shooter')">
+                        <span class="option-icon">🎪</span>
+                        <div class="option-text">
+                            <div class="option-title">シューター</div>
+                            <div class="option-desc">外からのシュートが中心</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="previousQuestion()">戻る</button>
+                <button class="btn btn-primary" id="next1" onclick="nextQuestion()" disabled>次へ</button>
+            </div>
+        </div>
+
+        <!-- Question 2: Court Position -->
+        <div id="q2" class="question-container">
+            <div class="question">
+                <h2>主なポジションは？</h2>
+                <div class="options">
+                    <div class="option" onclick="selectOption(2, 'guard')">
+                        <span class="option-icon">🏃</span>
+                        <div class="option-text">
+                            <div class="option-title">ガード</div>
+                            <div class="option-desc">機動力と素早い動きが重要</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(2, 'forward')">
+                        <span class="option-icon">🤸</span>
+                        <div class="option-text">
+                            <div class="option-title">フォワード</div>
+                            <div class="option-desc">中距離のプレイが多い</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(2, 'center')">
+                        <span class="option-icon">🏋️</span>
+                        <div class="option-text">
+                            <div class="option-title">センター</div>
+                            <div class="option-desc">ゴール下でのプレイが中心</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="previousQuestion()">戻る</button>
+                <button class="btn btn-primary" id="next2" onclick="nextQuestion()" disabled>次へ</button>
+            </div>
+        </div>
+
+        <!-- Question 3: Cushioning Preference -->
+        <div id="q3" class="question-container">
+            <div class="question">
+                <h2>クッション性の好みは？</h2>
+                <div class="options">
+                    <div class="option" onclick="selectOption(3, 'soft')">
+                        <span class="option-icon">☁️</span>
+                        <div class="option-text">
+                            <div class="option-title">柔らかめ</div>
+                            <div class="option-desc">衝撃吸収性を重視</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(3, 'firm')">
+                        <span class="option-icon">🪨</span>
+                        <div class="option-text">
+                            <div class="option-title">硬め</div>
+                            <div class="option-desc">反発性とコート感覚を重視</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(3, 'balanced')">
+                        <span class="option-icon">⚖️</span>
+                        <div class="option-text">
+                            <div class="option-title">バランス型</div>
+                            <div class="option-desc">ちょうど良いクッション性</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="previousQuestion()">戻る</button>
+                <button class="btn btn-primary" id="next3" onclick="nextQuestion()" disabled>次へ</button>
+            </div>
+        </div>
+
+        <!-- Question 4: Ankle Support -->
+        <div id="q4" class="question-container">
+            <div class="question">
+                <h2>足首のサポートは？</h2>
+                <div class="options">
+                    <div class="option" onclick="selectOption(4, 'high')">
+                        <span class="option-icon">🦿</span>
+                        <div class="option-text">
+                            <div class="option-title">ハイカット</div>
+                            <div class="option-desc">しっかりとした足首サポート</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(4, 'mid')">
+                        <span class="option-icon">👟</span>
+                        <div class="option-text">
+                            <div class="option-title">ミッドカット</div>
+                            <div class="option-desc">サポートと動きやすさの両立</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(4, 'low')">
+                        <span class="option-icon">🩴</span>
+                        <div class="option-text">
+                            <div class="option-title">ローカット</div>
+                            <div class="option-desc">軽量で機動性重視</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="previousQuestion()">戻る</button>
+                <button class="btn btn-primary" id="next4" onclick="nextQuestion()" disabled>次へ</button>
+            </div>
+        </div>
+
+        <!-- Question 5: Budget -->
+        <div id="q5" class="question-container">
+            <div class="question">
+                <h2>予算の目安は？</h2>
+                <div class="options">
+                    <div class="option" onclick="selectOption(5, 'budget')">
+                        <span class="option-icon">💰</span>
+                        <div class="option-text">
+                            <div class="option-title">〜15,000円</div>
+                            <div class="option-desc">コストパフォーマンス重視</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(5, 'mid')">
+                        <span class="option-icon">💵</span>
+                        <div class="option-text">
+                            <div class="option-title">15,000円〜25,000円</div>
+                            <div class="option-desc">標準的な価格帯</div>
+                        </div>
+                    </div>
+                    <div class="option" onclick="selectOption(5, 'premium')">
+                        <span class="option-icon">💎</span>
+                        <div class="option-text">
+                            <div class="option-title">25,000円〜</div>
+                            <div class="option-desc">ハイエンドモデル</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" onclick="previousQuestion()">戻る</button>
+                <button class="btn btn-primary" id="next5" onclick="showResult()" disabled>診断結果を見る</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div id="result" class="result-container">
+            <h2 style="margin-bottom: 20px;">診断結果</h2>
+            <div class="result-shoe" id="resultContent"></div>
+            <button class="btn btn-primary" onclick="restart()">もう一度診断する</button>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let answers = {};
+
+        const shoes = {
+            'nike-kd': {
+                name: 'Nike KD シリーズ',
+                brand: 'Nike',
+                description: 'バランスの取れた軽量モデル。優れたクッション性と反応性を兼ね備え、スピーディーなプレイに最適です。',
+                features: ['⚡ 軽量設計', '☁️ Zoom Airクッション', '🎯 高い安定性', '💨 優れた通気性'],
+                link: 'https://basshu2.com/archives/8369'
+            },
+            'nike-lebron': {
+                name: 'Nike LeBron シリーズ',
+                brand: 'Nike',
+                description: 'パワフルなプレイヤー向けのハイエンドモデル。最高級のクッション性とサポート性を提供します。',
+                features: ['💪 最大級のクッション', '🛡️ 強力な足首サポート', '⚡ Max Airユニット', '🏋️ 高い耐久性'],
+                link: 'https://basshu2.com/archives/8503'
+            },
+            'adidas-harden': {
+                name: 'adidas Harden シリーズ',
+                brand: 'adidas',
+                description: 'ステップバックやユーロステップに最適。優れたトラクションとクイックネスを実現します。',
+                features: ['🔄 優れたトラクション', '⚡ 軽量で素早い動き', '🎯 抜群のグリップ力', '💎 Boost クッション'],
+                link: 'https://basshu2.com/archives/8513'
+            },
+            'nike-kyrie': {
+                name: 'Nike Kyrie シリーズ',
+                brand: 'Nike',
+                description: 'クイックネスと方向転換に特化。ガード向けの究極のコントロール性能を持つシューズです。',
+                features: ['⚡ 超軽量', '🔄 優れた方向転換', '👟 ローカットデザイン', '🎯 コート感覚抜群'],
+                link: 'https://basshu2.com/archives/category/nike/kyrie'
+            },
+            'under-armour-curry': {
+                name: 'Under Armour Curry シリーズ',
+                brand: 'Under Armour',
+                description: 'シューター向けの設計。軽量で安定性に優れ、シュートフォームをサポートします。',
+                features: ['🎯 優れた安定性', '☁️ 快適なクッション', '⚖️ 軽量バランス', '💨 通気性抜群'],
+                link: 'https://basshu2.com/archives/8474'
+            },
+            'nike-giannis': {
+                name: 'Nike Giannis シリーズ',
+                brand: 'Nike',
+                description: 'オールラウンドなパフォーマンス。あらゆるポジションに対応できる万能モデルです。',
+                features: ['🎯 多目的設計', '💪 強力なサポート', '⚡ 優れた反応性', '🛡️ 高い耐久性'],
+                link: 'https://basshu2.com/archives/8559'
+            },
+            'jordan-luka': {
+                name: 'Air Jordan Luka シリーズ',
+                brand: 'Jordan Brand',
+                description: 'コストパフォーマンスに優れた万能モデル。初心者から上級者まで幅広く対応します。',
+                features: ['💰 優れたコスパ', '⚖️ バランス設計', '👟 快適なフィット', '🎯 安定したサポート'],
+                link: 'https://basshu2.com/archives/8391'
+            },
+            'nike-zoom-freak': {
+                name: 'Nike Zoom Freak シリーズ',
+                brand: 'Nike',
+                description: 'パワーとスピードの融合。ダイナミックなプレイスタイルに最適なモデルです。',
+                features: ['💪 パワフルなサポート', '⚡ 高速対応', '☁️ Zoom Air搭載', '🔄 優れたトラクション'],
+                link: 'https://basshu2.com/archives/8559'
+            }
+        };
+
+        function startQuiz() {
+            document.getElementById('startScreen').style.display = 'none';
+            currentQuestion = 1;
+            showQuestion(1);
+            updateProgress();
+        }
+
+        function showQuestion(num) {
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.remove('active');
+            });
+            document.getElementById('q' + num).classList.add('active');
+        }
+
+        function selectOption(question, value) {
+            answers[question] = value;
+            
+            // Remove all selected states
+            const questionDiv = document.getElementById('q' + question);
+            questionDiv.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected state to clicked option
+            event.currentTarget.classList.add('selected');
+            
+            // Enable next button
+            document.getElementById('next' + question).disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+            updateProgress();
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 1) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+                updateProgress();
+            } else {
+                currentQuestion = 0;
+                document.querySelectorAll('.question-container').forEach(q => {
+                    q.classList.remove('active');
+                });
+                document.getElementById('startScreen').style.display = 'block';
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / 5) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResult() {
+            // Hide questions
+            document.querySelectorAll('.question-container').forEach(q => {
+                q.classList.remove('active');
+            });
+            
+            // Determine best shoes based on answers
+            let shoeKeys = determineShoe();
+            
+            // Display results
+            let resultHTML = '';
+            shoeKeys.forEach((shoeKey, index) => {
+                let shoe = shoes[shoeKey];
+                let rank = index === 0 ? '🥇 最もおすすめ' : index === 1 ? '🥈 次点でおすすめ' : '🥉 こちらもおすすめ';
+                
+                resultHTML += `
+                    <div class="result-shoe" style="margin-bottom: ${index < shoeKeys.length - 1 ? '20px' : '0'};">
+                        <div style="color: #667eea; font-size: 14px; font-weight: bold; margin-bottom: 10px;">${rank}</div>
+                        <div class="brand">${shoe.brand}</div>
+                        <h2>${shoe.name}</h2>
+                        <div class="description">${shoe.description}</div>
+                        <div class="features">
+                            ${shoe.features.map(feature => `
+                                <div class="feature">
+                                    <span class="feature-icon">${feature.split(' ')[0]}</span>
+                                    <span>${feature.substring(feature.indexOf(' ') + 1)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        ${shoe.link ? `
+                            <a href="${shoe.link}" target="_blank" style="display: inline-block; margin-top: 20px; padding: 14px 28px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-decoration: none; border-radius: 10px; font-weight: bold; transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 15px rgba(102, 126, 234, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                                詳しいレビューを見る →
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('resultContent').innerHTML = resultHTML;
+            document.getElementById('result').classList.add('active');
+            updateProgress();
+        }
+
+        function determineShoe() {
+            // Logic to determine best shoes based on answers (returns array of 2-3 shoe keys)
+            const { 1: style, 2: position, 3: cushion, 4: ankle, 5: budget } = answers;
+            let recommendations = [];
+            
+            // Speed-focused guards
+            if (style === 'speed' && position === 'guard' && ankle === 'low') {
+                recommendations = ['nike-kyrie', 'adidas-harden', 'under-armour-curry'];
+            }
+            // Power players
+            else if (style === 'power' && position === 'center' && ankle === 'high') {
+                recommendations = ['nike-lebron', 'nike-giannis', 'nike-zoom-freak'];
+            }
+            // Shooters
+            else if (style === 'shooter') {
+                recommendations = ['under-armour-curry', 'nike-kd', 'nike-kyrie'];
+            }
+            // Budget-conscious
+            else if (budget === 'budget') {
+                recommendations = ['jordan-luka', 'nike-kd', 'adidas-harden'];
+            }
+            // Guards with step-back moves
+            else if (position === 'guard' && style !== 'shooter') {
+                recommendations = ['adidas-harden', 'nike-kyrie', 'jordan-luka'];
+            }
+            // Versatile forwards
+            else if (position === 'forward' && style === 'allround') {
+                recommendations = ['nike-giannis', 'nike-kd', 'nike-zoom-freak'];
+            }
+            // Athletic players
+            else if (style === 'speed' && ankle !== 'low') {
+                recommendations = ['nike-zoom-freak', 'nike-giannis', 'nike-kd'];
+            }
+            // Power forwards
+            else if (position === 'forward' && style === 'power') {
+                recommendations = ['nike-lebron', 'nike-zoom-freak', 'nike-giannis'];
+            }
+            // All-round guards
+            else if (position === 'guard' && style === 'allround') {
+                recommendations = ['nike-kd', 'nike-kyrie', 'jordan-luka'];
+            }
+            // Default: balanced options
+            else {
+                recommendations = ['nike-kd', 'nike-giannis', 'jordan-luka'];
+            }
+            
+            return recommendations;
+        }
+
+        function restart() {
+            currentQuestion = 0;
+            answers = {};
+            document.getElementById('result').classList.remove('active');
+            document.getElementById('startScreen').style.display = 'block';
+            updateProgress();
+            
+            // Reset all selections
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            document.querySelectorAll('.btn-primary[id^="next"]').forEach(btn => {
+                btn.disabled = true;
+            });
+        }
+    </script>
+</body>
+</html>
